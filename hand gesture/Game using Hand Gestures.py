@@ -1,104 +1,119 @@
-import sys
 import cv2
-import mediapipe
-import numpy
+import mediapipe as mp
 import autopy
 import pydirectinput as p1
+import tkinter as tk
+from tkinter import *
+import numpy as np
+import threading
 
+# Initialize the Tkinter GUI
+gui = tk.Tk() 
+gui.title("GESTURE GENIUS")
+gui.geometry("900x500")
+gui.resizable(False, False)
+gui.configure(bg="white")
 
+# Set the application icon
+img = PhotoImage(file="img.png")
+gui.iconphoto(False, img)
 
-cap = cv2.VideoCapture(0)
+# Create a label to display an image
+img_label = Label(image=img, height=500, width=925)
+img_label.place(x=-15, y=-2)
 
+# Shared variable to indicate whether to exit the recognition loop
+exit_recognition = False
 
-# detector = HandDetector(detectionCon=0.8,maxHands=2)
-initHand = mediapipe.solutions.hands  # Initializing mediapipe
-# Object of mediapipe with "arguments for the hands module"
-mainHand = initHand.Hands(min_detection_confidence=0.8, min_tracking_confidence=0.8)
-draw = mediapipe.solutions.drawing_utils  # Object to draw the connections between each finger index
-wScr, hScr = autopy.screen.size()  # Outputs the high and width of the screen (1920 x 1080)
-pX, pY = 0, 0  # Previous x and y location
-cX, cY = 0, 0  # Current x and y location
+# Function to start gesture recognition
+def start_gesture_recognition():
+    def detect_finger_states(landmarks):
+        finger_tips = []
+        tip_ids = [4, 8, 12, 16, 20]
 
-def handLandmarks(colorImg):
-    landmarkList = []  # Default values if no landmarks are tracked
-    landmarkPositions = mainHand.process(colorImg)  # Object for processing the video input
-    landmarkCheck = landmarkPositions.multi_hand_landmarks  # Stores the out of the processing object (returns False on empty)
-    if landmarkCheck:  # Checks if landmarks are tracked
-        for hand in landmarkCheck:  # Landmarks for each hand
-            for index, landmark in enumerate(
-                    hand.landmark):  # Loops through the 21 indexes and outputs their landmark coordinates (x, y, & z)
-                draw.draw_landmarks(img, hand,
-                                    initHand.HAND_CONNECTIONS)  # Draws each individual index on the hand with connections
-                h, w, c = img.shape  # Height, width and channel on the image
-                centerX, centerY = int(landmark.x * w), int(
-                    landmark.y * h)  # Converts the decimal coordinates relative to the image for each index
-                landmarkList.append([index, centerX, centerY])  # Adding index and its coordinates to a list
-    return landmarkList
-
-def fingers(landmarks):
-    fingerTips = []  # To store 4 sets of 1s or 0s
-    tipIds = [4, 8, 12, 16, 20]  # Indexes for the tips of each finger
-    # Check if thumb is up
-    if landmarks[tipIds[0]][1] > lmList[tipIds[0] - 1][1]:
-        fingerTips.append(1)
-    else:
-        fingerTips.append(0)
-    # Check if fingers are up except the thumb
-    for id in range(1, 5):
-        if landmarks[tipIds[id]][2] < landmarks[tipIds[id] - 3][2]:  # Checks to see if the tip of the finger is higher than the joint
-            fingerTips.append(1)
+        if landmarks[tip_ids[0]][1] > landmarks[tip_ids[0] - 1][1]:
+            finger_tips.append(1)
         else:
-            fingerTips.append(0)
-    return fingerTips
+            finger_tips.append(0)
 
+        for id in range(1, 5):
+            if landmarks[tip_ids[id]][2] < landmarks[tip_ids[id] - 3][2]:
+                finger_tips.append(1)
+            else:
+                finger_tips.append(0)
 
-while True:
-    check, img = cap.read()  # Reads frames from the camera
-    imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)  # Changes the format of the frames from BGR to RGB
-    lmList = handLandmarks(imgRGB)
+        return finger_tips
 
+    cap = cv2.VideoCapture(0)
+    mp_hands = mp.solutions.hands
+    mp_drawing = mp.solutions.drawing_utils
+    hands = mp_hands.Hands(min_detection_confidence=0.8, min_tracking_confidence=0.8)
+    w_scr, h_scr = autopy.screen.size()
+    p_x, p_y = 0, 0
 
-    if len(lmList) != 0:
-        x1, y1 = lmList[8][1:]  # Gets index 8s x and y values (skips index value because it starts from 1)
-        x2, y2 = lmList[12][1:]  # Gets index 12s x and y values (skips index value because it starts from 1)
-        finger = fingers(lmList)  # Calling the fingers function to check which fingers are up
+    while not exit_recognition:
+        check, img = cap.read()
+        img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        landmark_list = []
 
-        if finger[1] == 1 and finger[2] == 0 and finger[4] ==0:  # Checks to see if the pointing finger is up and thumb finger is down
-            x3 = numpy.interp(x1, (75, 640 - 75),(0, wScr))  # Converts the width of the window relative to the screen width
-            y3 = numpy.interp(y1, (75, 480 - 75),(0, hScr))  # Converts the height of the window relative to the screen height
+        results = hands.process(img_rgb)
 
-            cX = pX + (x3 - pX) / 7  # Stores previous x locations to update current x location
-            cY = pY + (y3 - pY) / 7  # Stores previous y locations to update current y location
+        if results.multi_hand_landmarks:
+            for landmarks in results.multi_hand_landmarks:
+                for id, landmark in enumerate(landmarks.landmark):
+                    mp_drawing.draw_landmarks(img, landmarks, mp_hands.HAND_CONNECTIONS)
+                    h, w, c = img.shape
+                    center_x, center_y = int(landmark.x * w), int(landmark.y * h)
+                    landmark_list.append([id, center_x, center_y])
 
-            autopy.mouse.move(wScr - cX,cY)  # Function to move the mouse to the x3 and y3 values (wSrc inverts the direction)
-            pX, pY = cX, cY  # Stores the current x and y location as previous x and y location for next loop
+            finger_states = detect_finger_states(landmark_list)
 
-        # time.sleep(5)
-        # p.hotkey('win', 'printscreen')
-        # print(finger)
-    # 1 means the finger is up and 0 means the finger is down
+            if finger_states[1] == 1 and finger_states[2] == 0 and finger_states[4] == 0:
+                x3 = np.interp(landmark_list[8][1], (75, 640 - 75), (0, w_scr))
+                y3 = np.interp(landmark_list[8][2], (75, 480 - 75), (0, h_scr))
 
-        if finger[1] == 0 and finger[0] == 1 :  # Checks to see if the pointer finger is down and thumb finger is up
-             p1.click(button = 'left')
-        
-        if sum(finger) == 5:
-             p1.keyDown("right")
-             p1.keyUp("left")
-        
-        elif sum(finger) == 0:
-             p1.keyDown("left")
-             p1.keyUp("right")
-        elif finger[1] == 1 and finger[2] == 1 and finger[3] == 1:
-             p1.press("space")
-        elif finger[1]==1:
-             p1.keyUp("right")
-             p1.keyUp("left")
+                c_x = p_x + (x3 - p_x) / 7
+                c_y = p_y + (y3 - p_y) / 7
 
-    cv2.imshow("Webcam", img)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-try:
-    cv2.release()
-except:
-    sys.exit()
-cv2.destroyAllWindows()
+                autopy.mouse.move(w_scr - c_x, c_y)
+                p_x, p_y = c_x, c_y
+
+            if finger_states[1] == 0 and finger_states[0] == 1:
+                p1.click(button='left')
+
+            if sum(finger_states) == 5:
+                p1.keyDown("right")
+                p1.keyUp("left")
+
+            elif sum(finger_states) == 0:
+                p1.keyDown("left")
+                p1.keyUp("right")
+            elif finger_states[1] == 1 and finger_states[2] == 1 and finger_states[3] == 1:
+                p1.press("space")
+            elif finger_states[1] == 1:
+                p1.keyUp("right")
+                p1.keyUp("left")
+
+        cv2.imshow("Webcam", img)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+# Function to close the GUI and exit the recognition
+def quit_app():
+    global exit_recognition
+    exit_recognition = True
+    gui.destroy()
+
+# Configuration elements for the title bar
+Label(text="GENIUS GESTURE", font="Algerian 25 ", fg="white", bg="black").place(x=315, y=30)
+
+# Configuration elements for the Start button
+start_button = Button(gui, text="START", width=10, bg="white", font='garamond', command=lambda: threading.Thread(target=start_gesture_recognition).start())
+start_button.place(x=200, y=100)
+
+# Configuration elements for the Exit button
+exit_button = Button(gui, text="EXIT", width=10, bg="white", font='garamond', fg="black", command=quit_app)
+exit_button.place(x=600, y=100)
+
+# Run the tkinter GUI
+gui.mainloop()
