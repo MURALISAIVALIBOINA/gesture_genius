@@ -79,7 +79,7 @@ Contributions are welcome! Please fork the repository and create a pull request 
 5. Create a new Pull Request.
 
 ## License
-This project is licensed under the MIT License. See the [LICENSE]([LICENSE](https://github.com/tweag/mediapipe-experiments/blob/master/LICENSE)) file for details.
+This project is licensed under the MIT License. See the [LICENSE](https://github.com/tweag/mediapipe-experiments/blob/master/LICENSE) file for details.
 
 ## Acknowledgements
 - Inspired by various open-source projects and tutorials on gesture recognition.
