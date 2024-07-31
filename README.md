@@ -1,28 +1,78 @@
-# Requisites 
+# Gesture Genius
 
-* [Tkinter](https://pypi.org/project/tk-tools/) for to create graphical user interfaces (GUIs)
-* [Mediapipe](https://pypi.org/project/mediapipe/) for Recognizing hand gestures
-* [Autopy](https://pypi.org/project/autopy/) for pointers
-* [Pydirectinput](https://pypi.org/project/PyDirectInput/) for keyboard inputs.
+Gesture Genius is a Python-based application that uses computer vision and hand tracking to recognize and respond to hand gestures. This project leverages OpenCV, MediaPipe, and autopy libraries to implement gesture-based controls for various functions.
 
-# Explanation
+## Table of Contents
+- [Introduction](#introduction)
+- [Features](#features)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Technologies Used](#technologies-used)
+- [Contributing](#contributing)
+- [License](#license)
+- [Acknowledgements](#acknowledgements)
 
--The code is a Python script that uses the Mediapipe library to detect hand landmarks from a live video stream and then performs mouse and keyboard actions based on the hand gestures.
+## Introduction
+Gesture Genius allows users to interact with their computer using hand gestures. It utilizes a webcam to capture video, detect hands, and interpret gestures to perform actions such as moving the mouse, clicking, and pressing keys.
 
--The script begins by Importing the necessary libraries and initializing objects for capturing video from the webcam and for detecting hand landmarks using the Mediapipe library. 
+## Features
+- **Gesture Recognition**: Recognizes various hand gestures using MediaPipe and performs corresponding actions.
+- **Mouse Control**: Move the mouse cursor using hand movements.
+- **Click and Key Press**: Use gestures to simulate mouse clicks and keyboard presses.
+- **GUI**: A simple Tkinter-based GUI to start and stop the gesture recognition.
 
--It also imports the Autopy library for mouse movement and the PyDirectInput library for keyboard input.
+## Installation
+To get started with Gesture Genius, follow these steps:
 
--The script then defines two functions: “handLandmarks” and “fingers”. The “handLandmarks” function takes a color image as input and returns a list of landmark coordinates for each hand that is detected in the image. 
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/MURALISAIVALIBOINA/gesture-genius.git
+   cd gesture-genius
+   ```
 
--The “fingers” function takes the list of landmark coordinates as input and returns a list of booleans indicating whether each finger is up or down.
+2. Install the required dependencies:
+   ```bash
+   pip install opencv-python mediapipe autopy pydirectinput
+   ```
 
--The script then enters a while loop that captures video from the webcam and processes each frame to detect hand landmarks and perform mouse and keyboard actions based on the hand gestures. 
+3. Download and save an image file named `img.png` in the project directory for the application icon.
 
--For each frame, the script converts the color image from BGR format to RGB format, detects the hand landmarks using the “handLandmarks” function, and checks for various hand gestures using the “fingers” function.
+## Usage
+1. Run the application:
+   ```bash
+   python main.py
+   ```
 
--If the pointing finger is up and the thumb finger is down, the script moves the mouse cursor based on the position of the pointing finger. If the pointer finger is down and the thumb finger is up, the script performs a left click using the “p1.click” function. 
+2. The Tkinter GUI will appear. Click the "START" button to begin gesture recognition.
 
--If all five fingers are up, the script performs a right arrow key press using the “p1.keyDown” and “p1.keyUp” functions. If all fingers are down, the script performs a left arrow key press using the same functions.
+3. The following gestures are supported:
+   - **Single Finger Pointing**: Moves the mouse cursor.
+   - **Thumb Up**: Left-click.
+   - **All Fingers Up**: Scroll right.
+   - **All Fingers Down**: Scroll left.
+   - **Index, Middle, and Ring Fingers Up**: Press space.
 
--The code Is used to perform various actions using hand gestures, such as controlling the mouse cursor, performing mouse clicks, and keyboard actions. It can be used for various applications such as virtual presentations, gaming, and controlling devices hands-free.
+4. Click the "EXIT" button to stop the recognition and close the application.
+
+## Technologies Used
+- **OpenCV**: For video capture and image processing.
+- **MediaPipe**: For hand tracking and gesture recognition.
+- **autopy**: For controlling the mouse and keyboard.
+- **pydirectinput**: For simulating key presses.
+- **Tkinter**: For the graphical user interface.
+
+## Contributing
+Contributions are welcome! Please fork the repository and create a pull request with your changes.
+
+1. Fork the repository.
+2. Create a new branch (`git checkout -b feature/your-feature`).
+3. Commit your changes (`git commit -m 'Add some feature'`).
+4. Push to the branch (`git push origin feature/your-feature`).
+5. Create a new Pull Request.
+
+## License
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## Acknowledgements
+- Inspired by various open-source projects and tutorials on gesture recognition.
+- Thanks to the developers of OpenCV, MediaPipe, autopy, and other libraries used in this project.
