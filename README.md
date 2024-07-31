@@ -7,6 +7,7 @@ Gesture Genius is a Python-based application that uses computer vision and hand 
 - [Features](#features)
 - [Installation](#installation)
 - [Usage](#usage)
+- [Requirements](#requirements)
 - [Technologies Used](#technologies-used)
 - [Contributing](#contributing)
 - [License](#license)
@@ -54,6 +55,13 @@ To get started with Gesture Genius, follow these steps:
 
 4. Click the "EXIT" button to stop the recognition and close the application.
 
+## Requirements
+- **Python 3.8 or higher**
+- **Hardware**:
+  - **Webcam**: A good quality webcam for accurate hand tracking.
+  - **CPU**: Intel i5 or equivalent for smooth processing.
+  - **RAM**: At least 4GB for handling image processing.
+
 ## Technologies Used
 - **OpenCV**: For video capture and image processing.
 - **MediaPipe**: For hand tracking and gesture recognition.
@@ -71,7 +79,7 @@ Contributions are welcome! Please fork the repository and create a pull request 
 5. Create a new Pull Request.
 
 ## License
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License. See the [LICENSE]([LICENSE](https://github.com/tweag/mediapipe-experiments/blob/master/LICENSE)) file for details.
 
 ## Acknowledgements
 - Inspired by various open-source projects and tutorials on gesture recognition.
