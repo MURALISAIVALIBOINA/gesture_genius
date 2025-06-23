@@ -84,3 +84,8 @@ This project is licensed under the MIT License. See the [LICENSE](https://github
 ## Acknowledgements
 - Inspired by various open-source projects and tutorials on gesture recognition.
 - Thanks to the developers of OpenCV, MediaPipe, autopy, and other libraries used in this project.
+- 
+## Contact 
+
+Name : MURALI SAI V
+MAIL ID : mv8039@srmist.edu.in
